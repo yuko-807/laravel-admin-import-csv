@@ -16,6 +16,6 @@ Route::group([
 
     $router->get('/', 'HomeController@index')->name('home');
     $router->resource('users', UserController::class);
-    $router->post('users/import', UserController::class.'@csvImport');
+    $router->post('users/import', [UserController::class, 'csvImport']);
 
 });

@@ -108,7 +108,7 @@ class UserController extends AdminController
             User::create([
                 'name' => $value[0],
                 'email' => $value[1],
-                'password' => $value[3],
+                'password' => $value[2],
             ]);
         }
 

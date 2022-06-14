@@ -34,7 +34,7 @@ class CsvImport extends AbstractTool
                     contentType : false,
                     success: function (response) {
                         $.pjax.reload("#pjax-container");
-                        toastr.success('Upload Successful');
+                        toastr.success('アップロード成功');
                     }
                 });
             });
