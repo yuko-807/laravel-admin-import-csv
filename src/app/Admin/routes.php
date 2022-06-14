@@ -1,6 +1,9 @@
 <?php
 
+use App\Admin\Controllers\UserController;
+use Encore\Admin\Facades\Admin;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Route;
 
 Admin::routes();
 
@@ -13,5 +16,6 @@ Route::group([
 
     $router->get('/', 'HomeController@index')->name('home');
     $router->resource('users', UserController::class);
+    $router->post('users/import', UserController::class.'@csvImport');
 
 });

@@ -7,6 +7,11 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Admin\Extensions\Tools\CsvImport;
+use Goodby\CSV\Import\Standard\Lexer;
+use Goodby\CSV\Import\Standard\Interpreter;
+use Goodby\CSV\Import\Standard\LexerConfig;
+use Illuminate\Http\Request;
 
 class UserController extends AdminController
 {
@@ -34,6 +39,9 @@ class UserController extends AdminController
         $grid->column('remember_token', __('Remember token'));
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'));
+        $grid->tools(function ($tools) {
+            $tools->append(new CsvImport());
+        });
 
         return $grid;
     }
@@ -77,4 +85,41 @@ class UserController extends AdminController
 
         return $form;
     }
+
+    public function csvImport(Request $request)
+    {
+        $file = $request->file('file');
+        $config = new LexerConfig();
+        $lexer = new Lexer($config);
+    
+        $interpreter = new Interpreter();
+        $rows = array();
+
+        // 行の一貫性は無視
+        $interpreter->unstrict();
+        $interpreter->addObserver(function (array $row) use (&$rows) {
+            $rows[] = $row;
+        });
+
+        // CSVデータをパース
+        $lexer->parse($file, $interpreter);
+        foreach ($rows as $key => $value) {
+            // データの作成
+            User::create([
+                'name' => $value[0],
+                'email' => $value[1],
+                'password' => $value[3],
+            ]);
+        }
+
+        return response()->json(
+            [
+                'data' => '成功'
+            ],
+            200,
+            [],
+            JSON_UNESCAPED_UNICODE
+        );
+    }
+
 }
